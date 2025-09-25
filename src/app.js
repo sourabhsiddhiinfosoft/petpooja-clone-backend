@@ -29,7 +29,6 @@ app.use(morgan("dev"));
 
 app.use(cors({
   origin: [
-    'http://localhost:3000',
     'https://petpooja-clone-backend.vercel.app/'
   ],
   credentials: true
