@@ -29,7 +29,7 @@ app.use(morgan("dev"));
 
 app.use(cors({
   origin: [
-    'https://petpooja-clone-backend.vercel.app/'
+    'https://petpooja-clone-frontend.vercel.app/'
   ],
   credentials: true
 }));
