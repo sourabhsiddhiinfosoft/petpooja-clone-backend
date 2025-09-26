@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/**/*.js": { 
-      "maxDuration": 60 // Increase to 60 seconds (or 30 if you prefer)
+      "maxDuration": 60
     }
   }
 }
