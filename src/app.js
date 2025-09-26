@@ -34,7 +34,7 @@ app.use(cors({
   credentials: true
 }));
 
-app.get("/", (req,res)=> res.json({status:"ok", service:"Restaurant Management System Backend"}));
+app.get("/", (req,res)=> res.json({status:"ok", service:"Restaurant Management System Backend updated 26 sep"}));
 
 app.get("/test", (req, res) => res.json({ status: "ok", service: "Testing backend is running" }));
 
