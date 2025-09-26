@@ -16,7 +16,9 @@ export async function connectDB(uri) {
   // Otherwise, create a new connection
   try {
     mongoose.set("strictQuery", true);
-    const connection = await mongoose.connect(uri);
+    const connection = await mongoose.connect(uri,{
+      serverSelectionTimeoutMS: 5000,
+    });
     cachedConnection = connection; // Cache the new connection
     console.log("✅ New MongoDB connection established");
     return connection;
