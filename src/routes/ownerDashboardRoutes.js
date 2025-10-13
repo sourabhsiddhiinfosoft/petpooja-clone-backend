@@ -4,7 +4,8 @@ import {
   getOwnerDashboardSummary,
   getOwnerRevenue,
   getOwnerCustomerStats,
-  getOwnerRecentOrders
+  getOwnerRecentOrders,
+  getOwnerDashboard
 } from "../controllers/ownerDashboardController.js";
 
 const router = express.Router();
@@ -12,6 +13,7 @@ const router = express.Router();
 router.use(requireAuth);
 router.use(requireRoles("owner")); // only restaurant owners
 
+router.get("/", getOwnerDashboard);
 router.get("/summary", getOwnerDashboardSummary);
 router.get("/revenue", getOwnerRevenue);
 router.get("/customers", getOwnerCustomerStats);
