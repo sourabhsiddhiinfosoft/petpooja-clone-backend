@@ -46,28 +46,14 @@ if (process.env.NODE_ENV === "production") {
 app.use(express.json());
 app.use(morgan("dev"));
 
-// --- CORS Configuration ---
-const allowedOrigins = [
-    'https://petpooja-clone-frontend.vercel.app/',
-    'http://localhost:3000'
-];
+app.use(cors({
+  origin: [
+    'https://petpooja-clone-frontend.vercel.app'
+  ],
+  credentials: true
+}));
 
-const corsOptions = {
-    origin: (origin, callback) => {
-        // Allow requests with no origin (e.g. file systems)
-        if (!origin) return callback(null, true);
-
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else if (process.env.NODE_ENV !== "production") {
-            // Allow all requests in development to support ngrok and local IPs
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true
-};
+app.get("/", (req,res)=> res.json({status:"ok", service:"Restaurant Management System Backend updated 26 sep"}));
 
 app.use(cors(corsOptions));
 
