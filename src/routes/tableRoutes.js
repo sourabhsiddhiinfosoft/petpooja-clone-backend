@@ -19,7 +19,7 @@ router.get("/:id", requireRoles("owner", "admin", "staff","waiter"), getTable);
 router.put("/:id", requireRoles("owner", "admin","waiter"), updateTable);
 router.delete("/:id", requireRoles("owner", "admin"), deleteTable);
 router.put("/:id/status", requireRoles("owner", "admin", "staff"), updateTableStatus);
-router.get("/running-tables-by-staff", requireRoles("owner", "admin", "staff","waiter"), getRunningTablesByStaff);
+router.get("/running-tables-by-staff/:id", requireRoles("owner", "admin", "staff","waiter"), getRunningTablesByStaff);
 
 export default router;
 

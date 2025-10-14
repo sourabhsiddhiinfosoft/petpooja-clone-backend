@@ -166,7 +166,7 @@ export const getTable = async (req, res) => {
 export const getRunningTablesByStaff = async (req, res) => {
   try {
     // const staffId = req.user._id; // From auth middleware (JWT)
-    const staffId = req.params?.staffId || req.user?._id; // Support both staff and user IDs
+    const staffId = req.params?.id || req.user?._id; // Support both staff and user IDs
 console.log("staffId:", staffId);
     if (!staffId) {
       return res.status(401).json({ 
@@ -179,8 +179,8 @@ console.log("staffId:", staffId);
 
     // Find tables assigned to this staff with running statuses
     const tables = await Table.find({ 
-      orderBy: staffId,  // Polymorphic: Matches Staff or User ID (with orderByType)
-      status: { $in: ['occupied', 'reserved'] }  // Running statuses only
+      orderBy: staffId, 
+      status: { $in: ['occupied', 'reserved'] }  
     })
       .populate('area', 'name description')  // Area details for grouping
       .populate('currentOrder', 'status total createdAt items')  // Current order summary
