@@ -43,15 +43,14 @@ export const listKOTs = async (req, res) => {
 // controllers/kotController.js (example)
 export const updateKOTStatus = async (req, res) => {
   try {
-    const { kotId } = req.params;
+    const kotId = req.params.id;
     const { status } = req.body; // From mutation body
-
     // Validation
     if (!['pending', 'preparing', 'ready'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status. Must be pending, preparing, or ready.' });
     }
 
-    const kot = await KOT.findByIdAndUpdate(
+    const kot = await kotModel.findByIdAndUpdate(
       kotId, 
       { status }, 
       { new: true, runValidators: true } // Return updated doc

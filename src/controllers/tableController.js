@@ -162,6 +162,74 @@ export const getTable = async (req, res) => {
   }
 };
 
+// GET running tables assigned to the logged-in staff/waiter
+export const getRunningTablesByStaff = async (req, res) => {
+  try {
+    // const staffId = req.user._id; // From auth middleware (JWT)
+    const staffId = req.params?.staffId || req.user?._id; // Support both staff and user IDs
+console.log("staffId:", staffId);
+    if (!staffId) {
+      return res.status(401).json({ 
+        success: false,
+        error: 'Staff ID not found. Authentication required.' 
+      });
+    }
+
+    console.log('Fetching running tables for staff:', staffId);
+
+    // Find tables assigned to this staff with running statuses
+    const tables = await Table.find({ 
+      orderBy: staffId,  // Polymorphic: Matches Staff or User ID (with orderByType)
+      status: { $in: ['occupied', 'reserved'] }  // Running statuses only
+    })
+      .populate('area', 'name description')  // Area details for grouping
+      .populate('currentOrder', 'status total createdAt items')  // Current order summary
+      .populate('orderBy', 'name email phone role')  // Polymorphic populate (Staff/User)
+      .sort({ 'name': 1 })  // Alphabetical by table name
+      .lean();  // Plain objects for performance
+
+    if (!tables || tables.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        message: 'No running tables assigned to this staff.'
+      });
+    }
+
+    // Group by area for frontend rendering (optional; flat array if preferred)
+    const groupedByArea = tables.reduce((acc, table) => {
+      const areaId = table.area?._id || 'ungrouped';
+      if (!acc[areaId]) {
+        acc[areaId] = {
+          _id: areaId,
+          name: table.area?.name || 'Ungrouped Tables',
+          description: table.area?.description || '',
+          tables: []
+        };
+      }
+      acc[areaId].tables.push(table);
+      return acc;
+    }, {});
+
+    const groupedTables = Object.values(groupedByArea);
+
+    res.status(200).json({
+      success: true,
+      data: groupedTables,  // [{ _id, name, tables: [...] }, ...]
+      message: `Found ${tables.length} running tables for staff.`,
+      totalTables: tables.length
+    });
+  } catch (error) {
+    console.error('Error fetching running tables by staff:', error);
+    res.status(500).json({ 
+      success: false,
+      error: error.message || 'Server error while fetching running tables' 
+    });
+  }
+};
+
+
+
 export const updateTable = async (req, res) => {
   try {
     const table = await Table.findByIdAndUpdate(req.params.id, req.body, { new: true });

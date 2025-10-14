@@ -6,6 +6,7 @@ import {
   updateTable,
   deleteTable,
   updateTableStatus,
+  getRunningTablesByStaff,
 } from "../controllers/tableController.js";
 import { requireAuth, requireRoles } from "../middlewares/auth.js";
 
@@ -18,6 +19,7 @@ router.get("/:id", requireRoles("owner", "admin", "staff","waiter"), getTable);
 router.put("/:id", requireRoles("owner", "admin","waiter"), updateTable);
 router.delete("/:id", requireRoles("owner", "admin"), deleteTable);
 router.put("/:id/status", requireRoles("owner", "admin", "staff"), updateTableStatus);
+router.get("/running-tables-by-staff", requireRoles("owner", "admin", "staff","waiter"), getRunningTablesByStaff);
 
 export default router;
 

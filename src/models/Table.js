@@ -18,6 +18,16 @@ const tableSchema = new mongoose.Schema(
          default: null
        },
     metadata: { type: mongoose.Schema.Types.Mixed },
+     orderBy: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      refPath: 'orderByType',  // Dynamic ref based on orderByType field
+      default: null 
+    },
+    orderByType: { 
+      type: String, 
+      enum: ['Staff', 'User'],  // Specifies the model type for orderBy
+      default: null 
+    },
   },
   { timestamps: true }
 );
