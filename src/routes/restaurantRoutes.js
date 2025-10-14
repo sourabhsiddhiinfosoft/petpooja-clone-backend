@@ -14,7 +14,7 @@ router.use(requireAuth);
 router.post("/", requireRoles("admin"), createRestaurant);
 router.get("/", requireRoles("admin"), getRestaurants);
 router.get("/:id", requireRoles("admin","owner"), getRestaurant);
-router.put("/:id", requireRoles("admin"), updateRestaurant);
+router.put("/:id", requireRoles("admin,owner"), updateRestaurant);
 router.delete("/:id", requireRoles("admin"), deleteRestaurant);
 
 export default router;

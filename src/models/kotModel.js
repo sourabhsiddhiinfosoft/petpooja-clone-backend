@@ -9,6 +9,7 @@ const kotItemSchema = new mongoose.Schema({
 const kotSchema = new mongoose.Schema({
   orderId: { type: mongoose.Schema.Types.ObjectId, ref: "Order", required: true },
   restaurantId: { type: mongoose.Schema.Types.ObjectId, ref: "Restaurant", required: true },
+  branchId: { type: mongoose.Schema.Types.ObjectId, ref: "Branch", required: true },
   tableId: { type: mongoose.Schema.Types.ObjectId, ref: "Table" },
   tableNo: String,
   items: [kotItemSchema],
@@ -16,3 +17,25 @@ const kotSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 export default mongoose.model("KOT", kotSchema);
+
+
+
+//old code not align with branch
+// import mongoose from "mongoose";
+
+// const kotItemSchema = new mongoose.Schema({
+//   menuItem: { type: mongoose.Schema.Types.ObjectId, ref: "MenuItem", required: true },
+//   name: String,
+//   qty: { type: Number, default: 1 }
+// }, { _id: false });
+
+// const kotSchema = new mongoose.Schema({
+//   orderId: { type: mongoose.Schema.Types.ObjectId, ref: "Order", required: true },
+//   restaurantId: { type: mongoose.Schema.Types.ObjectId, ref: "Restaurant", required: true },
+//   tableId: { type: mongoose.Schema.Types.ObjectId, ref: "Table" },
+//   tableNo: String,
+//   items: [kotItemSchema],
+//   status: { type: String, enum: ["pending", "preparing", "ready"], default: "pending" },
+// }, { timestamps: true });
+
+// export default mongoose.model("KOT", kotSchema);
