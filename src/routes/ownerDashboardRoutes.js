@@ -1,20 +1,20 @@
+// routes/ownerDashboardRoutes.js
 import express from "express";
-import { requireAuth, requireRoles } from "../middlewares/auth.js";
 import {
-  getOwnerDashboardSummary,
+  getOwnerDashboard,
   getOwnerRevenue,
   getOwnerCustomerStats,
   getOwnerRecentOrders,
-  getOwnerDashboard
 } from "../controllers/ownerDashboardController.js";
+import { requireAuth, requireRoles } from "../middlewares/auth.js";
 
 const router = express.Router();
 
 router.use(requireAuth);
-router.use(requireRoles("owner")); // only restaurant owners
+router.use(requireRoles("owner"));
 
+// Main dashboard
 router.get("/", getOwnerDashboard);
-router.get("/summary", getOwnerDashboardSummary);
 router.get("/revenue", getOwnerRevenue);
 router.get("/customers", getOwnerCustomerStats);
 router.get("/recent-orders", getOwnerRecentOrders);

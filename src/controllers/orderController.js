@@ -223,6 +223,86 @@ export const addPayment = async (req, res) => {
   }
 };
 
+// ✅ UPDATED: UPDATE ORDER (e.g., add or update items in existing order)
+export const updateOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params;  // From URL: /orders/:orderId
+    const { items: newItems = [], status } = req.body;  // Payload: new items to add/update, optional status
+    const staffId = req.user._id;  // From auth (staff/owner making the update)
+
+    if (!orderId) {
+      return res.status(400).json({ error: "orderId is required in the URL." });
+    }
+
+    const order = await Order.findById(orderId).populate('items.menuItem');  // Populate for validation
+    if (!order) {
+      return res.status(404).json({ error: "Order not found." });
+    }
+
+    if (order.status !== "pending" && order.status !== "occupied") {
+      return res.status(400).json({ error: "Order is not in an updatable state." });
+    }
+
+    let netAddedItems = [];  // Track net additions for inventory
+
+    if (newItems && Array.isArray(newItems) && newItems.length > 0) {
+      const newItemDocs = await Promise.all(
+        newItems.map(async (i) => {
+          const menuItem = await MenuItem.findById(i._id);
+          if (!menuItem) throw new Error(`Menu item not found: ${i._id}`);
+          if (!menuItem.isAvailable) throw new Error(`Menu item unavailable: ${menuItem.name}`);
+          return { 
+            menuItem: menuItem._id, 
+            name: menuItem.name, 
+            qty: i.quantity || 1,  // Use quantity from payload
+            price: menuItem.price 
+          };
+        })
+      );
+
+      newItemDocs.forEach((newItem) => {
+        const existingItemIndex = order.items.findIndex(item => item.menuItem.toString() === newItem.menuItem.toString());
+        if (existingItemIndex !== -1) {
+          // Update existing item quantity
+          const existingItem = order.items[existingItemIndex];
+          const originalQty = existingItem.qty;
+          order.items[existingItemIndex].qty += newItem.qty;  // Increment quantity
+          netAddedItems.push({ ...newItem, netQty: newItem.qty });  // Track for inventory (full added qty)
+        } else {
+          // Add new item
+          order.items.push(newItem);
+          netAddedItems.push(newItem);  // Track for inventory
+        }
+      });
+
+      // Recalculate totals after updates
+      const totals = computeTotals(order.items, order.taxRate || 0, order.discount || 0);
+      order.subtotal = totals.subtotal;
+      order.tax = totals.tax;
+      order.total = totals.total;
+
+      // Deduct inventory for net added quantities
+      await deductInventoryForOrder({ items: netAddedItems });  // Only for newly added or updated items
+    }
+
+    // // Handle status update if provided
+    // if (status && ['pending', 'preparing', 'ready', 'completed'].includes(status)) {
+    //   order.status = status;
+    //   if (status === 'completed' && order.tableId) {
+    //     await Table.findByIdAndUpdate(order.tableId, { status: "available", currentOrder: null });
+    //   }
+    // }
+
+    order.updatedBy = staffId;  // Track who updated
+    await order.save();
+
+    res.status(200).json({ success: true, data: order, message: "Order updated successfully." });
+  } catch (error) {
+    console.error('Error updating order:', error);
+    res.status(400).json({ success: false, error: error.message || "Failed to update order." });
+  }
+};
+
 
 //old code not with branch
 // import Order from "../models/Order.js";

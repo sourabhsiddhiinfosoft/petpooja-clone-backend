@@ -76,6 +76,16 @@ export const updateKOTStatus = async (req, res) => {
   }
 };
 
+export const getKOTById = async (req, res) => {
+  try {
+    const kot = await kotModel.findById(req.params.id).populate("orderId tableId");
+    if (!kot) return res.status(404).json({ error: "KOT not found" });
+    res.json(kot);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+};
+
 
 // export const updateKOTStatus = async (req, res) => {
 //   try {

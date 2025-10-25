@@ -31,7 +31,7 @@ const orderSchema = new mongoose.Schema({
 
   kotIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "KOT" }], // ✅ track KOTs
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "Staff" }, // ✅ who made it
-
+updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Staff" }, // ✅ who updated last
 }, { timestamps: true });
 
 export default mongoose.model("Order", orderSchema);

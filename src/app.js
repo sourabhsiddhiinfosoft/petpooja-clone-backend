@@ -93,6 +93,10 @@ app.use("/api/admin/dashboard",adminDashboardRoutes);
 app.use("/api/owner/dashboard",ownerDashboardRoutes);
 app.use("/api/branches", branchRoutes);
 
+// Serve static uploads (for local multer)
+if (process.env.NODE_ENV !== "production") {
+  app.use("/uploads", express.static("uploads"));
+}
 
 // ----------------------------------------------------------------------
 // 2. FRONTEND PROXY MIDDLEWARE (With enhanced debugging and connection fixes)
