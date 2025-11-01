@@ -277,20 +277,38 @@ export const addMenuItem = async (req, res) => {
 //update with branch flow
 
 
-export const getMenu = async (req, res) => {
-  try {
-    const restaurantId = req.params.restaurantId || req.user.restaurantId;
-    const { categoryId, branchId } = req.query;
-    const filter = { restaurantId };
-    if (categoryId) filter.categoryId = categoryId;
-    if (branchId) filter.branchId = branchId;
+   export const getMenu = async (req, res) => {
+     try {
+       const restaurantId = req.params.restaurantId || req.user.restaurantId;
+       const { categoryId, branchId } = req.query;
+       const filter = { restaurantId };
+       if (categoryId) filter.categoryId = categoryId;
+       if (branchId) filter.branchId = branchId;
 
-    const items = await MenuItem.find(filter).populate("categoryId", "name");
-    res.json(items);
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-};
+       const items = await MenuItem.find(filter)
+         .populate("categoryId", "name")
+         .populate("ingredients.inventoryItem", "name currentQuantity unit");  // Populate inventory details
+       res.json(items);
+     } catch (e) {
+       res.status(500).json({ error: e.message });
+     }
+   };
+   
+
+// export const getMenu = async (req, res) => {
+//   try {
+//     const restaurantId = req.params.restaurantId || req.user.restaurantId;
+//     const { categoryId, branchId } = req.query;
+//     const filter = { restaurantId };
+//     if (categoryId) filter.categoryId = categoryId;
+//     if (branchId) filter.branchId = branchId;
+
+//     const items = await MenuItem.find(filter).populate("categoryId", "name");
+//     res.json(items);
+//   } catch (e) {
+//     res.status(500).json({ error: e.message });
+//   }
+// };
 
 
 export const updateMenuItem = async (req, res) => {

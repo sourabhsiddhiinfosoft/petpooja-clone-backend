@@ -4,13 +4,14 @@ import Restaurant from "../models/Restaurant.js";
 
 export const createBranch = async (req, res, next) => {
   try {
-    const restaurantId = req.params.restaurantId;
+    const {restaurantId} = req.params ||  req.body;
+    console.log('Creating branch for restaurantId:', restaurantId);
     // ensureRestaurantOwner middleware should have validated ownership
     const restaurant = await Restaurant.findById(restaurantId);
     if (!restaurant) return res.status(404).json({ message: 'Restaurant not found' });
 
     const branch = await Branch.create({
-      restaurantId: restaurant._id,
+      restaurantId: restaurant?._id,
       name: req.body.name,
       address: req.body.address || {},
       manager: req.body.manager || {},

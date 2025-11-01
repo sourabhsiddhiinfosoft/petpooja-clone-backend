@@ -72,6 +72,23 @@ const deductInventoryForOrder = async (order) => {
   }
 };
 
+const newDeductInventoryForOrder = async (order) => {
+      // Deduct inventory for each menu item in the order
+    for (const item of order.items) {  // Assume order.items has menuItemId and quantity
+      const menuItem = await MenuItem.findById(item.menuItemId).populate('ingredients.inventoryItem');
+      if (menuItem?.ingredients) {
+        for (const ingredient of menuItem.ingredients) {
+          if (ingredient.inventoryItem) {
+            const deductQuantity = ingredient.qty * item.quantity;  // Calculate deduction
+            await InventoryItem.findByIdAndUpdate(ingredient.inventoryItem._id, {
+              $inc: { currentQuantity: -deductQuantity }  // Deduct from inventory
+            });
+          }
+        }
+      }
+    }
+}
+
 // ✅ PLACE ORDER / KOT
 export const placeOrder = async (req, res) => {
   try {
@@ -147,7 +164,8 @@ export const placeOrder = async (req, res) => {
     }
 
     // ✅ Deduct inventory
-    await deductInventoryForOrder(order);
+    // await deductInventoryForOrder(order);
+    await newDeductInventoryForOrder(order);
 
     res.status(201).json(order);
   } catch (e) {
@@ -239,7 +257,7 @@ export const updateOrder = async (req, res) => {
       return res.status(404).json({ error: "Order not found." });
     }
 
-    if (order.status !== "pending" && order.status !== "occupied") {
+    if (order.status !== "preparing" && order.status !== "occupied") {
       return res.status(400).json({ error: "Order is not in an updatable state." });
     }
 
